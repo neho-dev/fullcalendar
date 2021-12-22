@@ -69,6 +69,7 @@ export const BASE_OPTION_REFINERS = {
   defaultRangeSeparator: String,
   titleRangeSeparator: String,
   forceEventDuration: Boolean,
+  showEmptyDayListView: identity as Identity<Function | false>,
 
   dayHeaders: Boolean,
   dayHeaderFormat: createFormatter,

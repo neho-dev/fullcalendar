@@ -69,7 +69,7 @@ export class ListView extends DateComponent<ViewProps> {
               overflowX={props.isHeightAuto ? 'visible' : 'hidden'}
               overflowY={props.isHeightAuto ? 'visible' : 'auto'}
             >
-              {eventSegs.length > 0 ?
+              {(this.context.options.showEmptyDayListView || eventSegs.length > 0) ?
                 this.renderSegList(eventSegs, dayDates) :
                 this.renderEmptyMessage()}
             </Scroller>
@@ -126,13 +126,14 @@ export class ListView extends DateComponent<ViewProps> {
         {(nowDate: DateMarker, todayRange: DateRange) => {
           let innerNodes: VNode[] = []
 
-          for (let dayIndex = 0; dayIndex < segsByDay.length; dayIndex += 1) {
+          let dates = options.showEmptyDayListView ? dayDates : segsByDay;
+
+          for (let dayIndex = 0; dayIndex < dates.length; dayIndex += 1) {
             let daySegs = segsByDay[dayIndex]
+            let dayStr = formatDayString(dayDates[dayIndex])
+            let dateHeaderId = dateHeaderIdRoot + '-' + dayStr
 
             if (daySegs) { // sparse array, so might be undefined
-              let dayStr = formatDayString(dayDates[dayIndex])
-              let dateHeaderId = dateHeaderIdRoot + '-' + dayStr
-
               // append a day header
               innerNodes.push(
                 <ListViewHeaderRow
@@ -160,6 +161,16 @@ export class ListView extends DateComponent<ViewProps> {
                     {...getSegMeta(seg, todayRange, nowDate)}
                   />,
                 )
+              }
+            }
+
+            if(!daySegs && options.showEmptyDayListView) {
+              innerNodes.push(createElement(ListViewHeaderRow, { key: dayStr, cellId: dateHeaderId, dayDate: dayDates[dayIndex], todayRange: todayRange }));
+              if(typeof options.showEmptyDayListView === 'function' ) {
+                innerNodes.push(options.showEmptyDayListView(
+                  new Date(dayDates[dayIndex].getTime()),
+                  createElement
+                ));
               }
             }
           }
