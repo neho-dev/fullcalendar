@@ -132,6 +132,14 @@ export class ListView extends DateComponent<ViewProps> {
             let daySegs = segsByDay[dayIndex]
             let dayStr = formatDayString(dayDates[dayIndex])
             let dateHeaderId = dateHeaderIdRoot + '-' + dayStr
+            let resultEmptyDay = null
+            
+            if(options.showEmptyDayListView && typeof options.showEmptyDayListView === 'function') {
+              resultEmptyDay = options.showEmptyDayListView(
+                new Date(dayDates[dayIndex].getTime()),
+                createElement
+              )
+            }
 
             if (daySegs) { // sparse array, so might be undefined
               // append a day header
@@ -143,6 +151,10 @@ export class ListView extends DateComponent<ViewProps> {
                   todayRange={todayRange}
                 />,
               )
+              
+              if(resultEmptyDay) {
+                innerNodes.push(resultEmptyDay);
+              }
 
               daySegs = sortEventSegs(daySegs, options.eventOrder)
 
@@ -162,19 +174,10 @@ export class ListView extends DateComponent<ViewProps> {
                   />,
                 )
               }
-            }
-
-            if(!daySegs && options.showEmptyDayListView) {
-              if(typeof options.showEmptyDayListView === 'function' ) {
-                let resultEmptyDay = options.showEmptyDayListView(
-                  new Date(dayDates[dayIndex].getTime()),
-                  createElement
-                )
-
-                if(resultEmptyDay) {
-                  innerNodes.push(createElement(ListViewHeaderRow, { key: dayStr, cellId: dateHeaderId, dayDate: dayDates[dayIndex], todayRange: todayRange }));
-                  innerNodes.push(resultEmptyDay);
-                }
+            } else {
+              if(resultEmptyDay) {
+                innerNodes.push(createElement(ListViewHeaderRow, { key: dayStr, cellId: dateHeaderId, dayDate: dayDates[dayIndex], todayRange: todayRange }));
+                innerNodes.push(resultEmptyDay);
               }
             }
           }
