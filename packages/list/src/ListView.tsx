@@ -165,12 +165,16 @@ export class ListView extends DateComponent<ViewProps> {
             }
 
             if(!daySegs && options.showEmptyDayListView) {
-              innerNodes.push(createElement(ListViewHeaderRow, { key: dayStr, cellId: dateHeaderId, dayDate: dayDates[dayIndex], todayRange: todayRange }));
               if(typeof options.showEmptyDayListView === 'function' ) {
-                innerNodes.push(options.showEmptyDayListView(
+                let resultEmptyDay = options.showEmptyDayListView(
                   new Date(dayDates[dayIndex].getTime()),
                   createElement
-                ));
+                )
+
+                if(resultEmptyDay) {
+                  innerNodes.push(createElement(ListViewHeaderRow, { key: dayStr, cellId: dateHeaderId, dayDate: dayDates[dayIndex], todayRange: todayRange }));
+                  innerNodes.push(resultEmptyDay);
+                }
               }
             }
           }
