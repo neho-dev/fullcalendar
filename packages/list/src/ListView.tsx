@@ -125,8 +125,8 @@ export class ListView extends DateComponent<ViewProps> {
       <NowTimer unit="day">
         {(nowDate: DateMarker, todayRange: DateRange) => {
           let innerNodes: VNode[] = []
-
           let dates = options.showEmptyDayListView ? dayDates : segsByDay;
+          let hasDates = false
 
           for (let dayIndex = 0; dayIndex < dates.length; dayIndex += 1) {
             let daySegs = segsByDay[dayIndex]
@@ -154,6 +154,7 @@ export class ListView extends DateComponent<ViewProps> {
               
               if(resultEmptyDay) {
                 innerNodes.push(resultEmptyDay);
+                hasDates = true;
               }
 
               daySegs = sortEventSegs(daySegs, options.eventOrder)
@@ -178,8 +179,13 @@ export class ListView extends DateComponent<ViewProps> {
               if(resultEmptyDay) {
                 innerNodes.push(createElement(ListViewHeaderRow, { key: dayStr, cellId: dateHeaderId, dayDate: dayDates[dayIndex], todayRange: todayRange }));
                 innerNodes.push(resultEmptyDay);
+                hasDates = true;
               }
             }
+          }
+
+          if(!hasDates && options.showEmptyDayListView && typeof options.showEmptyDayListView === 'function') {
+            innerNodes.push(options.showEmptyDayListView(null, createElement));
           }
 
           return (
